@@ -248,7 +248,8 @@ const App: React.FC = () => {
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
     setDownloadProgress(0);
-    await new Promise(resolve => setTimeout(resolve, 100)); // UI refresh
+    // Yield to UI to show the progress bar immediately
+    await new Promise(resolve => setTimeout(resolve, 10)); 
     
     try {
       // @ts-ignore
@@ -287,8 +288,8 @@ const App: React.FC = () => {
           for (let i = 0; i < totalCards; i++) {
             // Update progress
             setDownloadProgress(Math.round(((i) / totalCards) * 80));
-            // Small delay to allow UI to update
-            if (i % 3 === 0) await new Promise(r => setTimeout(r, 10));
+            // Crucial: Yield to the main thread so React can re-render the progress bar
+            await new Promise(r => setTimeout(r, 1));
 
             const cardEl = cardElements[i] as HTMLElement;
             
@@ -318,6 +319,8 @@ const App: React.FC = () => {
       
       // --- Calling List (Common for both) ---
       setDownloadProgress(90);
+      await new Promise(r => setTimeout(r, 10)); // Yield
+
       pdf.addPage();
       
       const listElement = document.getElementById('calling-list-export');
@@ -417,12 +420,16 @@ const App: React.FC = () => {
             </div>
             
             <div className="flex gap-3 items-center">
+               {/* Progress Bar Display */}
                {isDownloading && (
-                 <div className="flex flex-col items-end mr-2">
-                    <span className="text-xs font-bold text-indigo-600 mb-1">PDF Maken... {downloadProgress}%</span>
-                    <div className="w-32 h-2 bg-indigo-100 rounded-full overflow-hidden">
+                 <div className="flex flex-col items-end mr-3 w-40 animate-in fade-in slide-in-from-right-4">
+                    <div className="flex justify-between w-full mb-1">
+                        <span className="text-xs font-bold text-indigo-600">PDF Maken...</span>
+                        <span className="text-xs font-bold text-indigo-500">{downloadProgress}%</span>
+                    </div>
+                    <div className="w-full h-2.5 bg-indigo-100 rounded-full overflow-hidden shadow-inner">
                        <div 
-                         className="h-full bg-gradient-to-r from-indigo-500 to-pink-500 transition-all duration-300"
+                         className="h-full bg-gradient-to-r from-indigo-500 to-pink-500 transition-all duration-200 ease-out"
                          style={{ width: `${downloadProgress}%` }}
                        />
                     </div>
@@ -433,11 +440,11 @@ const App: React.FC = () => {
                 <button 
                   onClick={handleDownloadPDF}
                   disabled={isDownloading}
-                  className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-2.5 rounded-full hover:shadow-xl hover:shadow-pink-200 hover:-translate-y-0.5 transition-all shadow-md disabled:opacity-70 disabled:cursor-wait font-bold"
+                  className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-2.5 rounded-full hover:shadow-xl hover:shadow-pink-200 hover:-translate-y-0.5 transition-all shadow-md disabled:opacity-70 disabled:cursor-wait font-bold disabled:hover:translate-y-0"
                   title="Download als PDF"
                 >
                   {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Printer size={18} />}
-                  {isDownloading ? 'Bezig...' : 'Download PDF'}
+                  {isDownloading ? 'Even geduld...' : 'Download PDF'}
                 </button>
               )}
             </div>
