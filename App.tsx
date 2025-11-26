@@ -3,7 +3,7 @@ import { BingoItem, BingoCardData, GeneratorStatus, SubjectContext } from './typ
 import { generateBingoItems, detectSubject } from './services/geminiService';
 import { BingoCard } from './components/BingoCard';
 import { MathDisplay } from './components/MathDisplay';
-import { Loader2, RefreshCw, LayoutGrid, ListChecks, Sparkles, Image as ImageIcon, X, Copy, Wand2, Settings2, Calculator, Check, Download, Palette, Printer, Type } from 'lucide-react';
+import { Loader2, RefreshCw, LayoutGrid, ListChecks, Sparkles, Image as ImageIcon, X, Settings2, Calculator, Check, Palette, Printer } from 'lucide-react';
 
 const App: React.FC = () => {
   const [status, setStatus] = useState<GeneratorStatus>(GeneratorStatus.IDLE);
@@ -151,7 +151,6 @@ const App: React.FC = () => {
     const headerHeight = 8;
     const totalCardHeight = (rows * cellHeight) + headerHeight;
 
-    let cursorX = margin;
     let cursorY = 30; // Start below title on page 1
     
     // Title Page 1
